@@ -31,14 +31,6 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts
 # Copy the rest of the application
 COPY . .
 
-# Generate application key if not set
-RUN php artisan key:generate --force
-
-# Cache configuration
-RUN php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache
-
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
     chmod -R 775 /var/www/storage /var/www/bootstrap/cache
