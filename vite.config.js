@@ -11,7 +11,7 @@ export default defineConfig({
         tailwindcss(),
     ],
     build: {
-        manifest: 'manifest.json',
+        manifest: true,
         outDir: 'public/build',
         rollupOptions: {
             output: {
