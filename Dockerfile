@@ -12,8 +12,10 @@ RUN npm install --verbose
 # Copy source files
 COPY . .
 
-# Build assets with verbose output
-RUN npm run build --verbose
+# Build assets with verbose output and ensure manifest is created
+RUN npm run build --verbose && \
+    ls -la public/build/ && \
+    cat public/build/manifest.json
 
 # PHP application stage
 FROM php:8.2-fpm-alpine
@@ -33,8 +35,13 @@ RUN apk add --no-cache --progress \
 # Clear cache
 RUN apk cache clean
 
-# Install PHP extensions with progress indicator
-RUN docker-php-ext-install -j$(nproc) pdo_mysql mbstring exif pcntl bcmath gd
+# Install PHP extensions one by one to better handle failures
+RUN docker-php-ext-install pdo_mysql && \
+    docker-php-ext-install mbstring && \
+    docker-php-ext-install exif && \
+    docker-php-ext-install pcntl && \
+    docker-php-ext-install bcmath && \
+    docker-php-ext-install gd
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -45,9 +52,12 @@ WORKDIR /var/www
 # Copy application files
 COPY . .
 
-# Copy built assets from node-builder
+# Copy built assets from node-builder (including manifest)
 COPY --from=node-builder /app/public/build /var/www/public/build
-COPY --from=node-builder /app/public/build/manifest.json /var/www/public/build/manifest.json
+
+# Verify manifest exists
+RUN ls -la /var/www/public/build/ && \
+    cat /var/www/public/build/manifest.json
 
 # Install composer dependencies with memory limit
 RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-interaction --verbose
