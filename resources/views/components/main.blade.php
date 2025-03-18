@@ -163,7 +163,7 @@
         </div>
       </div>
       
-      <div class="mt-12 bg-blue-100 p-6 rounded-lg">
+      <!-- <div class="mt-12 bg-blue-100 p-6 rounded-lg">
         <h3 class="text-xl font-bold mb-3">Safety Features</h3>
         <p class="text-gray-700 mb-4">At Alpine Air Adventures, safety is our top priority. Our power hang gliders are equipped with multiple redundant safety systems designed specifically for the challenging conditions of the Canadian Rockies:</p>
         <div class="grid md:grid-cols-3 gap-4">
@@ -180,7 +180,7 @@
             <p class="text-sm text-gray-600">Real-time weather data systems to track changing conditions in the mountains.</p>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
     
     <!-- Call to Action -->
