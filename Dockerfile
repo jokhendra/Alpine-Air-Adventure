@@ -47,6 +47,7 @@ COPY . .
 
 # Copy built assets from node-builder
 COPY --from=node-builder /app/public/build /var/www/public/build
+COPY --from=node-builder /app/public/manifest.json /var/www/public/manifest.json
 
 # Install composer dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
@@ -59,7 +60,8 @@ RUN mkdir -p /var/www/storage/framework/{sessions,views,cache} \
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 775 /var/www/storage \
-    && chmod -R 775 /var/www/bootstrap/cache
+    && chmod -R 775 /var/www/bootstrap/cache \
+    && chmod -R 775 /var/www/public/build
 
 # Generate optimized files
 RUN php artisan config:cache && \

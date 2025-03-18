@@ -15,8 +15,16 @@ export default defineConfig({
         outDir: 'public/build',
         rollupOptions: {
             output: {
-                manualChunks: undefined
+                manualChunks: undefined,
+                entryFileNames: 'assets/[name].js',
+                chunkFileNames: 'assets/[name].js',
+                assetFileNames: 'assets/[name].[ext]'
             }
+        }
+    },
+    server: {
+        hmr: {
+            host: 'localhost'
         }
     }
 });
