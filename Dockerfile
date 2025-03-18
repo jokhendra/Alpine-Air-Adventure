@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.2-cli
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -8,8 +8,7 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip \
-    nginx
+    unzip
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -32,14 +31,8 @@ RUN composer install --no-dev --optimize-autoloader
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Configure Nginx
-COPY docker/nginx/conf.d/app.conf /etc/nginx/conf.d/default.conf
+# Expose port
+EXPOSE 8000
 
 # Start command
-CMD php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache && \
-    php-fpm -D && \
-    nginx -g "daemon off;"
-
-EXPOSE 80 
+CMD php artisan serve --host=0.0.0.0 --port=$PORT 
