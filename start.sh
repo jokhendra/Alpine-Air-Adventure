@@ -31,15 +31,13 @@ chmod -R 775 storage bootstrap/cache
 ls -la storage/
 ls -la bootstrap/cache/
 
-# Check database connection
+# Test database connection with detailed logging
 echo "Testing database connection..."
-php artisan db:monitor
+php artisan db:test-connection
 
 # Check Laravel configuration
 echo "Checking Laravel configuration..."
 php artisan --version
-php artisan config:get database.connections.mysql.host
-php artisan config:get database.connections.mysql.database
 
 # Create storage link if it doesn't exist
 echo "Creating storage link..."
@@ -48,4 +46,12 @@ php artisan storage:link --force
 # Start the application with error reporting
 echo "Starting Laravel application..."
 echo "Server will be available at http://0.0.0.0:8000"
-php artisan serve --host=0.0.0.0 --port=8000 --verbose 
+
+# Enable query logging for local environment
+if [ "$APP_ENV" = "local" ]; then
+    echo "Enabling SQL query logging for local environment..."
+    export QUERY_LOG=true
+fi
+
+# Start the server with logging
+php artisan serve --host=0.0.0.0 --port=8000 --verbose
