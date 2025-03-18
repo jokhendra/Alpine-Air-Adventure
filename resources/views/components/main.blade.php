@@ -199,6 +199,7 @@
       </div>
     </div>
     
+    
     <!-- Canadian Weather Notice -->
     <div class="bg-blue-50 p-6 rounded-lg mb-12">
       <h3 class="text-xl font-bold mb-2">Canadian Weather Advisory</h3>
