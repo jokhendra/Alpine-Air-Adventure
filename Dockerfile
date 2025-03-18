@@ -51,16 +51,30 @@ COPY --from=node-builder /app/public/build /var/www/public/build
 # Install composer dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
+# Create storage directory structure
+RUN mkdir -p /var/www/storage/framework/{sessions,views,cache} \
+    && mkdir -p /var/www/storage/logs \
+    && mkdir -p /var/www/bootstrap/cache
+
 # Set permissions
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 /var/www/storage \
+    && chmod -R 775 /var/www/bootstrap/cache
 
 # Generate optimized files
 RUN php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache
 
+# Create storage link
+RUN php artisan storage:link
+
+# Copy and setup start script
+COPY start.sh /var/www/start.sh
+RUN chmod +x /var/www/start.sh
+
 # Expose port
 EXPOSE 8000
 
-# Start the application
-CMD php artisan serve --host=0.0.0.0 --port=8000 
+# Start the application using the startup script
+CMD ["/var/www/start.sh"] 
