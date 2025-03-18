@@ -5,6 +5,16 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ChatBotController;
 use App\Http\Controllers\BookingController;
 
+// Health Check Route for Railway
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'up',
+        'timestamp' => now()->toIso8601String(),
+        'environment' => app()->environment(),
+        'php_version' => PHP_VERSION
+    ], 200);
+});
+
 Route::get('/', function () {
     return view('welcome');
 });
