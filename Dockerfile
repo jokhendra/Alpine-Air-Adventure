@@ -3,24 +3,23 @@ FROM node:18-alpine as node-builder
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first to leverage Docker cache
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies with verbose output
+RUN npm install --verbose
 
 # Copy source files
 COPY . .
 
-# Build assets
-RUN npm run build
-RUN npm run dev
+# Build assets with verbose output
+RUN npm run build --verbose
 
 # PHP application stage
 FROM php:8.2-fpm-alpine
 
-# Install system dependencies
-RUN apk add --no-cache \
+# Install system dependencies with progress indicator
+RUN apk add --no-cache --progress \
     linux-headers \
     bash \
     git \
@@ -34,8 +33,8 @@ RUN apk add --no-cache \
 # Clear cache
 RUN apk cache clean
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+# Install PHP extensions with progress indicator
+RUN docker-php-ext-install -j$(nproc) pdo_mysql mbstring exif pcntl bcmath gd
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -50,8 +49,8 @@ COPY . .
 COPY --from=node-builder /app/public/build /var/www/public/build
 COPY --from=node-builder /app/public/build/manifest.json /var/www/public/build/manifest.json
 
-# Install composer dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Install composer dependencies with memory limit
+RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader --no-interaction --verbose
 
 # Create storage directory structure
 RUN mkdir -p /var/www/storage/framework/{sessions,views,cache} \
@@ -83,6 +82,7 @@ ENV PHP_ERROR_REPORTING=E_ALL
 ENV PHP_DISPLAY_ERRORS=1
 ENV PHP_LOG_ERRORS=1
 ENV PHP_ERROR_LOG=/var/www/storage/logs/php_errors.log
+ENV COMPOSER_MEMORY_LIMIT=-1
 
 # Expose port
 EXPOSE 8000
