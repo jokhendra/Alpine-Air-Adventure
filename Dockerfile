@@ -73,6 +73,14 @@ RUN php artisan storage:link
 COPY start.sh /var/www/start.sh
 RUN chmod +x /var/www/start.sh
 
+# Set environment variables
+ENV PHP_INI_SCAN_DIR=/usr/local/etc/php/conf.d
+ENV PHP_INI_DIR=/usr/local/etc/php
+ENV PHP_ERROR_REPORTING=E_ALL
+ENV PHP_DISPLAY_ERRORS=1
+ENV PHP_LOG_ERRORS=1
+ENV PHP_ERROR_LOG=/var/www/storage/logs/php_errors.log
+
 # Expose port
 EXPOSE 8000
 
