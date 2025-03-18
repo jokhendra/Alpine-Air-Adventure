@@ -35,13 +35,15 @@ RUN apk add --no-cache --progress \
 # Clear cache
 RUN apk cache clean
 
-# Install PHP extensions one by one to better handle failures
-RUN docker-php-ext-install pdo_mysql && \
-    docker-php-ext-install mbstring && \
-    docker-php-ext-install exif && \
-    docker-php-ext-install pcntl && \
-    docker-php-ext-install bcmath && \
-    docker-php-ext-install gd
+# Install PHP extensions with memory limit and error handling
+RUN set -ex; \
+    docker-php-ext-install -j$(nproc) pdo_mysql || true; \
+    docker-php-ext-install -j$(nproc) mbstring || true; \
+    docker-php-ext-install -j$(nproc) exif || true; \
+    docker-php-ext-install -j$(nproc) pcntl || true; \
+    docker-php-ext-install -j$(nproc) bcmath || true; \
+    docker-php-ext-install -j$(nproc) gd || true; \
+    php -m
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -93,6 +95,7 @@ ENV PHP_DISPLAY_ERRORS=1
 ENV PHP_LOG_ERRORS=1
 ENV PHP_ERROR_LOG=/var/www/storage/logs/php_errors.log
 ENV COMPOSER_MEMORY_LIMIT=-1
+ENV PHP_MEMORY_LIMIT=512M
 
 # Expose port
 EXPOSE 8000
