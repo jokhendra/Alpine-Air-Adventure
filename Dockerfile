@@ -14,6 +14,7 @@ COPY . .
 
 # Build assets
 RUN npm run build
+RUN npm run dev
 
 # PHP application stage
 FROM php:8.2-fpm-alpine
